@@ -35,7 +35,6 @@ body {
 
 .sidebar h1 {
     font-size: 28px;
-    margin-bottom: 20px;
 }
 
 .controls {
@@ -103,6 +102,7 @@ canvas {
     height: auto;
     max-height: calc(50% - 10px);
     object-fit: contain;
+    border-radius: 5px;
 }
 
 .logo {

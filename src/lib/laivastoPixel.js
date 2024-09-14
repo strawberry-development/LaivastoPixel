@@ -138,7 +138,13 @@ class LaivastoPixel {
         const palettes = {
             default: color,
             grayscale: this.toGrayscale(color),
-            pastel: this.toPastel(color)
+            pastel: this.toPastel(color),
+            negative: this.toNegative(color),
+            sepia: this.toSepia(color),
+            vibrant: this.toVibrant(color),
+            retro: this.toRetro(color),
+            neon: this.toNeon(color),
+            muted: this.toMuted(color)
         };
 
         return palettes[this.colorPalette] || color;
@@ -151,6 +157,50 @@ class LaivastoPixel {
 
     toPastel([r, g, b]) {
         return [Math.min(255, r + 100), Math.min(255, g + 100), Math.min(255, b + 100)];
+    }
+
+    toNegative([r, g, b]) {
+        return [255 - r, 255 - g, 255 - b];
+    }
+
+    toSepia([r, g, b]) {
+        const tr = 0.393 * r + 0.769 * g + 0.189 * b;
+        const tg = 0.349 * r + 0.686 * g + 0.168 * b;
+        const tb = 0.272 * r + 0.534 * g + 0.131 * b;
+        return [Math.min(255, tr), Math.min(255, tg), Math.min(255, tb)];
+    }
+
+    toVibrant([r, g, b]) {
+        return [
+            Math.min(255, r * 1.2),
+            Math.min(255, g * 1.2),
+            Math.min(255, b * 1.2)
+        ];
+    }
+
+    toRetro([r, g, b]) {
+        // Using some classic retro game palette colors
+        return [
+            r < 128 ? r * 1.2 : r * 0.8,
+            g < 128 ? g * 1.2 : g * 0.8,
+            b < 128 ? b * 1.2 : b * 0.8
+        ];
+    }
+
+    toNeon([r, g, b]) {
+        return [
+            Math.min(255, r + 100),
+            Math.min(255, g + 100),
+            Math.min(255, b + 100)
+        ];
+    }
+
+    toMuted([r, g, b]) {
+        return [
+            r * 0.8,
+            g * 0.8,
+            b * 0.8
+        ];
     }
 
     resetCanvas() {
