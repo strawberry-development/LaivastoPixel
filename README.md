@@ -1,6 +1,11 @@
+<picture>
+  <img alt="github-logo" src="/src/img/logo/android-chrome-512x512.png" width="20%" height="20%">
+</picture>
 # LaivastoPixel - Pixel Art Generator
 
 LaivastoPixel is a pixel art generator library designed to convert images into pixel art. I made this after beeing disapointed by other librairy.
+
+![Overview of the page](github/Screenshot.png "Screenshot")
 
 **Important Note**
 
