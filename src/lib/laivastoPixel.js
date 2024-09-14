@@ -7,7 +7,7 @@
  * export the pixelated images. It also offers a grid toggle and customizable color palette for the user.
  */
 
-class LaivastoPixel {
+export default class LaivastoPixel {
     constructor(imageCanvas, pixelCanvas, controls) {
         this.imageCanvas = imageCanvas;
         this.pixelCanvas = pixelCanvas;
@@ -213,13 +213,11 @@ class LaivastoPixel {
     resetCanvas() {
         if (!this.originalImage) return;
 
-        // Reset image, pixelation, and all controls to their default values
         this.pixelSize = this.defaultPixelSize;
         this.brightness = this.defaultBrightness;
         this.contrast = this.defaultContrast;
         this.colorPalette = this.defaultColorPalette;
 
-        // Update the controls
         if (this.controls.pixelSizeRange) {
             this.controls.pixelSizeRange.value = this.defaultPixelSize;
             document.getElementById('pixelSizeValue').textContent = this.defaultPixelSize;
@@ -240,7 +238,6 @@ class LaivastoPixel {
             this.setColorPalette(this.defaultColorPalette); // Trigger color palette change
         }
 
-        // Reapply pixelation with default values
         this.applyPixelation();
     }
 
@@ -251,5 +248,3 @@ class LaivastoPixel {
         link.click();
     }
 }
-
-export default LaivastoPixel;
