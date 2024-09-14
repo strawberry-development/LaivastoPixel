@@ -6,8 +6,6 @@
 
 LaivastoPixel is a pixel art generator library designed to convert images into pixel art. I made this after beeing disapointed by other librairy.
 
-![Overview of the page](github/Screenshot.png "Screenshot")
-
 **Important Note**
 
 This project is a prototype created in just a few hours. It is still in its early stages and will evolve over time.
@@ -25,6 +23,10 @@ cd laivastopixel
 ```
 2. Open the project:
 Open index.html in your web browser. **It may not work, and you may have need to use a localserver**.
+
+3. feel free to use it and discover as your wish.
+example of page
+![Overview of the page](github/Screenshot.png "Screenshot")
 
 ## Usage
 
