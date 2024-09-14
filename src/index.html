@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaivastoPixel - Pixel Art Generator</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="editor-container">
+    <aside class="sidebar">
+        <h1>LaivastoPixel</h1>
+        <div class="controls">
+            <h2>Settings</h2>
+            <label for="pixelSizeRange">Pixel Size: <span id="pixelSizeValue">10</span></label>
+            <input type="range" id="pixelSizeRange" min="1" max="50" value="10" aria-labelledby="pixelSizeRange">
+
+            <label for="brightnessRange">Brightness: <span id="brightnessValue">1</span></label>
+            <input type="range" id="brightnessRange" min="0" max="2" step="0.1" value="1" aria-labelledby="brightnessRange">
+
+            <label for="contrastRange">Contrast: <span id="contrastValue">1</span></label>
+            <input type="range" id="contrastRange" min="0" max="2" step="0.1" value="1" aria-labelledby="contrastRange">
+
+            <label for="colorPaletteSelect">Color Palette:</label>
+            <select id="colorPaletteSelect">
+                <option value="default">Default</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="pastel">Pastel</option>
+            </select>
+
+            <button id="resetBtn" class="btn" aria-label="Reset Canvas">Reset</button>
+            <button id="downloadBtn" class="btn" aria-label="Download Pixelated Image">Download</button>
+        </div>
+    </aside>
+
+    <main class="canvas-area">
+        <nav class="toolbar">
+            <button id="uploadImageBtn" aria-label="Upload Image" class="btn">Upload Image</button>
+            <input type="file" id="imageInput" style="display:none;" accept="image/*">
+        </nav>
+        <section class="canvas-section">
+            <canvas id="imageCanvas"></canvas>
+            <canvas id="pixelCanvas"></canvas>
+        </section>
+    </main>
+</div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
