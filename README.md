@@ -2,10 +2,9 @@
 
 LaivastoPixel is a pixel art generator library designed to convert images into pixel art. I made this after beeing disapointed by other librairy.
 
-**Note**
+**Important Note**
 
-This project is a prototype made in few hours, it will evolve.
-
+This project is a prototype created in just a few hours. It is still in its early stages and will evolve over time.
 ## Getting Started
 ### Prerequisites
 - A modern web browser (e.g., Chrome, Firefox, Edge).
@@ -21,9 +20,7 @@ cd laivastopixel
 2. Open the project:
 Open index.html in your web browser. **It may not work, and you may have need to use a localserver**.
 
-## More information
-
-### Usage
+## Usage
 
 Initialize the Library:
 
@@ -65,7 +62,7 @@ Reset the Canvas:
 pixelMaster.resetCanvas();
 ```
 
-### Contributing
+## Contributing
 Contributions are welcome! Please follow these steps to contribute:
 1. Fork the repository.
 2. Create a new branch (git checkout -b feature-branch).
@@ -73,6 +70,6 @@ Contributions are welcome! Please follow these steps to contribute:
 4. Push to the branch (git push origin feature-branch).
 5. Open a pull request.
 
-### License
+## License
 
 This project is licensed under the GNU General Public License v3.0.
