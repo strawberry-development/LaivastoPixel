@@ -12,7 +12,6 @@ class LaivastoPixel {
         this.imageCanvas = imageCanvas;
         this.pixelCanvas = pixelCanvas;
 
-        // Ensure the canvas elements are valid
         if (!this.imageCanvas || !this.pixelCanvas) {
             throw new Error('Canvas elements are required.');
         }
@@ -20,7 +19,7 @@ class LaivastoPixel {
         this.ctxImage = this.imageCanvas.getContext('2d');
         this.ctxPixel = this.pixelCanvas.getContext('2d');
 
-        this.controls = controls;  // Controls for pixel size, brightness, contrast, etc.
+        this.controls = controls;
 
         this.originalImage = null;
         this.pixelSize = 10;
@@ -28,7 +27,6 @@ class LaivastoPixel {
         this.contrast = 1;
         this.colorPalette = 'default';
 
-        // Store default values for reset
         this.defaultPixelSize = this.pixelSize;
         this.defaultBrightness = this.brightness;
         this.defaultContrast = this.contrast;
@@ -57,7 +55,7 @@ class LaivastoPixel {
     loadImage(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = e => {
                 const img = new Image();
                 img.src = e.target.result;
                 img.onload = () => {
@@ -104,11 +102,14 @@ class LaivastoPixel {
         this.pixelCanvas.height = height;
         this.ctxPixel.clearRect(0, 0, width, height);
 
+        const imageData = this.originalImage.data;
+        const numPixels = (width / pixelSize) * (height / pixelSize);
+        const color = [0, 0, 0];
+
         for (let y = 0; y < height; y += pixelSize) {
             for (let x = 0; x < width; x += pixelSize) {
-                const pixelData = this.ctxImage.getImageData(x, y, pixelSize, pixelSize);
-                const avgColor = this.getAverageColor(pixelData.data);
-                const adjustedColor = this.adjustColor(avgColor);
+                this.getAverageColor(imageData, x, y, width, pixelSize, color);
+                const adjustedColor = this.adjustColor(color);
                 const paletteColor = this.applyPalette(adjustedColor);
 
                 this.ctxPixel.fillStyle = `rgb(${paletteColor[0]}, ${paletteColor[1]}, ${paletteColor[2]})`;
@@ -117,28 +118,44 @@ class LaivastoPixel {
         }
     }
 
-    getAverageColor(data) {
+    getAverageColor(data, startX, startY, width, pixelSize, color) {
         let r = 0, g = 0, b = 0;
-        const pixelCount = data.length / 4;
-        for (let i = 0; i < data.length; i += 4) {
-            r += data[i];
-            g += data[i + 1];
-            b += data[i + 2];
+        const pixelCount = pixelSize * pixelSize;
+        const startIdx = (startY * width + startX) * 4;
+
+        for (let y = 0; y < pixelSize; y++) {
+            for (let x = 0; x < pixelSize; x++) {
+                const idx = startIdx + ((y * width) + x) * 4;
+                r += data[idx];
+                g += data[idx + 1];
+                b += data[idx + 2];
+            }
         }
-        return [r / pixelCount, g / pixelCount, b / pixelCount];
+
+        color[0] = r / pixelCount;
+        color[1] = g / pixelCount;
+        color[2] = b / pixelCount;
     }
 
-    adjustColor(color) {
-        // Adjust color with brightness and contrast
-        const [r, g, b] = color.map(c => this.contrast * (c * this.brightness));
-        return [Math.min(255, Math.max(0, r)), Math.min(255, Math.max(0, g)), Math.min(255, Math.max(0, b))];
+    adjustColor([r, g, b]) {
+        return [
+            Math.min(255, Math.max(0, this.contrast * (r * this.brightness))),
+            Math.min(255, Math.max(0, this.contrast * (g * this.brightness))),
+            Math.min(255, Math.max(0, this.contrast * (b * this.brightness)))
+        ];
     }
 
     applyPalette(color) {
         const palettes = {
             default: color,
             grayscale: this.toGrayscale(color),
-            pastel: this.toPastel(color)
+            pastel: this.toPastel(color),
+            negative: this.toNegative(color),
+            sepia: this.toSepia(color),
+            vibrant: this.toVibrant(color),
+            retro: this.toRetro(color),
+            neon: this.toNeon(color),
+            muted: this.toMuted(color)
         };
 
         return palettes[this.colorPalette] || color;
@@ -153,6 +170,46 @@ class LaivastoPixel {
         return [Math.min(255, r + 100), Math.min(255, g + 100), Math.min(255, b + 100)];
     }
 
+    toNegative([r, g, b]) {
+        return [255 - r, 255 - g, 255 - b];
+    }
+
+    toSepia([r, g, b]) {
+        return [
+            Math.min(255, 0.393 * r + 0.769 * g + 0.189 * b),
+            Math.min(255, 0.349 * r + 0.686 * g + 0.168 * b),
+            Math.min(255, 0.272 * r + 0.534 * g + 0.131 * b)
+        ];
+    }
+
+    toVibrant([r, g, b]) {
+        return [
+            Math.min(255, r * 1.2),
+            Math.min(255, g * 1.2),
+            Math.min(255, b * 1.2)
+        ];
+    }
+
+    toRetro([r, g, b]) {
+        return [
+            r < 128 ? r * 1.2 : r * 0.8,
+            g < 128 ? g * 1.2 : g * 0.8,
+            b < 128 ? b * 1.2 : b * 0.8
+        ];
+    }
+
+    toNeon([r, g, b]) {
+        return [
+            Math.min(255, r + 100),
+            Math.min(255, g + 100),
+            Math.min(255, b + 100)
+        ];
+    }
+
+    toMuted([r, g, b]) {
+        return [r * 0.8, g * 0.8, b * 0.8];
+    }
+
     resetCanvas() {
         if (!this.originalImage) return;
 
@@ -162,11 +219,28 @@ class LaivastoPixel {
         this.contrast = this.defaultContrast;
         this.colorPalette = this.defaultColorPalette;
 
-        if (this.controls.pixelSizeRange) this.controls.pixelSizeRange.value = this.defaultPixelSize;
-        if (this.controls.brightnessRange) this.controls.brightnessRange.value = this.defaultBrightness;
-        if (this.controls.contrastRange) this.controls.contrastRange.value = this.defaultContrast;
-        if (this.controls.colorPaletteSelect) this.controls.colorPaletteSelect.value = this.defaultColorPalette;
+        // Update the controls
+        if (this.controls.pixelSizeRange) {
+            this.controls.pixelSizeRange.value = this.defaultPixelSize;
+            document.getElementById('pixelSizeValue').textContent = this.defaultPixelSize;
+            this.setPixelSize(this.defaultPixelSize); // Trigger pixel size change
+        }
+        if (this.controls.brightnessRange) {
+            this.controls.brightnessRange.value = this.defaultBrightness;
+            document.getElementById('brightnessValue').textContent = this.defaultBrightness;
+            this.setBrightness(this.defaultBrightness); // Trigger brightness change
+        }
+        if (this.controls.contrastRange) {
+            this.controls.contrastRange.value = this.defaultContrast;
+            document.getElementById('contrastValue').textContent = this.defaultContrast;
+            this.setContrast(this.defaultContrast); // Trigger contrast change
+        }
+        if (this.controls.colorPaletteSelect) {
+            this.controls.colorPaletteSelect.value = this.defaultColorPalette;
+            this.setColorPalette(this.defaultColorPalette); // Trigger color palette change
+        }
 
+        // Reapply pixelation with default values
         this.applyPixelation();
     }
 
