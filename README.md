@@ -22,7 +22,7 @@ git clone https://github.com/yourusername/laivastopixel.git
 cd laivastopixel
 ```
 2. Open the project:
-Open index.html in your web browser. **It may not work, and you may have need to use a localserver**.
+Open `index.html` in your web browser. **It may not work, and you may have need to use a localserver**.
 
 3. feel free to use it and discover as your wish.
 example of page
