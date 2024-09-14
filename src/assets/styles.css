@@ -36,7 +36,6 @@ body {
 .sidebar h1 {
     font-size: 28px;
     margin-bottom: 20px;
-    text-align: center;
 }
 
 .controls {
@@ -88,14 +87,24 @@ button.btn:active {
     background-color: #6200ea;
 }
 
-canvas {
-    border: 2px solid #333;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    background-color: #fff;
+.canvas-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-footer {
-    display: none;
+canvas {
+    width: 100%;
+    height: auto;
+    max-height: calc(50% - 10px);
+    object-fit: contain;
+}
+
+.logo {
+    max-width: 100%;
 }
