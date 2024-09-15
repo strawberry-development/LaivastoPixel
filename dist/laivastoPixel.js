@@ -1,6 +1,6 @@
 /**
  * LaivastoPixel - A Pixel Art Generator Library by 'Strawberry-development'.
- * Version: 1.0.0
+ * Version: 1.0.1
  * License: GNU
  *
  * This library allows you to convert images into pixel art, adjust settings (brightness, contrast), and
@@ -19,6 +19,10 @@ export default class LaivastoPixel {
         this.ctxImage = this.imageCanvas.getContext('2d');
         this.ctxPixel = this.pixelCanvas.getContext('2d');
 
+        if (!this.ctxImage || !this.ctxPixel) {
+            throw new Error('Failed to get 2D context from canvas elements.');
+        }
+
         this.controls = controls;
 
         this.originalImage = null;
@@ -31,6 +35,8 @@ export default class LaivastoPixel {
         this.defaultBrightness = this.brightness;
         this.defaultContrast = this.contrast;
         this.defaultColorPalette = this.colorPalette;
+
+        this.timer = null;
 
         this.initEventListeners();
     }
@@ -59,32 +65,41 @@ export default class LaivastoPixel {
                 const img = new Image();
                 img.src = e.target.result;
                 img.onload = () => {
-                    this.imageCanvas.width = img.width;
-                    this.imageCanvas.height = img.height;
-                    this.ctxImage.drawImage(img, 0, 0);
-                    this.originalImage = this.ctxImage.getImageData(0, 0, img.width, img.height);
+                    // Resize image if necessary and adjust dimensions to ensure full pixels
+                    this.imageCanvas.width = Math.floor(img.width / this.pixelSize) * this.pixelSize;
+                    this.imageCanvas.height = Math.floor(img.height / this.pixelSize) * this.pixelSize;
+
+                    this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
+
+                    this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
                     this.applyPixelation();
                     resolve();
                 };
                 img.onerror = reject;
             };
+            reader.onerror = reject;
             reader.readAsDataURL(file);
         });
     }
 
+    debounce(fn, delay) {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(fn.bind(this), delay);
+    }
+
     setPixelSize(size) {
-        this.pixelSize = parseInt(size, 10);
-        this.applyPixelation();
+        this.pixelSize = Math.max(1, parseInt(size, 10)); // Ensure pixel size is at least 1
+        this.debounce(this.applyPixelation.bind(this), 50);
     }
 
     setBrightness(brightness) {
         this.brightness = parseFloat(brightness);
-        this.applyPixelation();
+        this.debounce(this.applyPixelation.bind(this), 50);
     }
 
     setContrast(contrast) {
         this.contrast = parseFloat(contrast);
-        this.applyPixelation();
+        this.debounce(this.applyPixelation.bind(this), 50);
     }
 
     setColorPalette(palette) {
@@ -95,27 +110,38 @@ export default class LaivastoPixel {
     applyPixelation() {
         if (!this.originalImage) return;
 
-        const pixelSize = this.pixelSize;
+        const pixelSize = Math.floor(this.pixelSize);
         const { width, height } = this.originalImage;
 
+        // Ensure pixel canvas matches image canvas dimensions exactly
         this.pixelCanvas.width = width;
         this.pixelCanvas.height = height;
         this.ctxPixel.clearRect(0, 0, width, height);
 
         const imageData = this.originalImage.data;
-        const numPixels = (width / pixelSize) * (height / pixelSize);
-        const color = [0, 0, 0];
 
-        for (let y = 0; y < height; y += pixelSize) {
-            for (let x = 0; x < width; x += pixelSize) {
-                this.getAverageColor(imageData, x, y, width, pixelSize, color);
-                const adjustedColor = this.adjustColor(color);
-                const paletteColor = this.applyPalette(adjustedColor);
+        // Ensure that no partial pixels are drawn
+        const numRows = Math.floor(height / pixelSize);
+        const numCols = Math.floor(width / pixelSize);
 
-                this.ctxPixel.fillStyle = `rgb(${paletteColor[0]}, ${paletteColor[1]}, ${paletteColor[2]})`;
-                this.ctxPixel.fillRect(x, y, pixelSize, pixelSize);
+        let y = 0;
+        const loop = () => {
+            for (let row = 0; row < numRows; row++) {
+                for (let col = 0; col < numCols; col++) {
+                    const startX = col * pixelSize;
+                    const startY = row * pixelSize;
+                    const color = [0, 0, 0];
+                    this.getAverageColor(imageData, startX, startY, width, pixelSize, color);
+                    const adjustedColor = this.adjustColor(color);
+                    const paletteColor = this.applyPalette(adjustedColor);
+
+                    this.ctxPixel.fillStyle = `rgb(${paletteColor[0]}, ${paletteColor[1]}, ${paletteColor[2]})`;
+                    this.ctxPixel.fillRect(startX, startY, pixelSize, pixelSize);
+                }
+                y += pixelSize;
             }
-        }
+        };
+        loop();
     }
 
     getAverageColor(data, startX, startY, width, pixelSize, color) {
@@ -139,9 +165,9 @@ export default class LaivastoPixel {
 
     adjustColor([r, g, b]) {
         return [
-            Math.min(255, Math.max(0, this.contrast * (r * this.brightness))),
-            Math.min(255, Math.max(0, this.contrast * (g * this.brightness))),
-            Math.min(255, Math.max(0, this.contrast * (b * this.brightness)))
+            Math.min(255, Math.max(0, Math.round(this.contrast * (r * this.brightness)))),
+            Math.min(255, Math.max(0, Math.round(this.contrast * (g * this.brightness)))),
+            Math.min(255, Math.max(0, Math.round(this.contrast * (b * this.brightness))))
         ];
     }
 

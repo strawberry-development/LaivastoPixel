@@ -26,7 +26,6 @@ body {
 .sidebar {
     background-color: #1e1e1e;
     padding: 20px;
-    border-radius: 10px;
     max-width: 300px;
     margin-right: 20px;
     flex: 1;
