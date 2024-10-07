@@ -8,7 +8,7 @@ LaivastoPixel is a pixel art generator library designed to convert images into p
 
 **Important Note**
 
-This project is a prototype created in just a few hours. It is still in its early stages and will evolve over time.
+This project is a prototype created in just a few hours. It is still in its early stages and will evolve over time (Not yet).
 ## Getting Started
 ### Prerequisites
 - A modern web browser (e.g., Chrome, Firefox, Edge).
