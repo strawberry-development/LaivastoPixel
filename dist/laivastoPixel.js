@@ -10,7 +10,7 @@
 export default class LaivastoPixel {
     constructor() {
         this.imageCanvas = document.getElementById('imageCanvas');
-        this.pixelCanvas = document.getElementById('pixelCanvas');;
+        this.pixelCanvas = document.getElementById('pixelCanvas');
 
         if (!this.imageCanvas || !this.pixelCanvas) {
             throw new Error('Canvas elements are required.');
@@ -24,6 +24,10 @@ export default class LaivastoPixel {
         }
 
         this.controls = {
+            imageInput: document.getElementById('imageInput'),
+            uploadImageBtn: document.getElementById('uploadImageBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
             pixelSizeRange: document.getElementById('pixelSizeRange'),
             brightnessRange: document.getElementById('brightnessRange'),
             contrastRange: document.getElementById('contrastRange'),
@@ -47,20 +51,83 @@ export default class LaivastoPixel {
     }
 
     initEventListeners() {
-        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect } = this.controls;
+        const {
+            imageInput,
+            uploadImageBtn,
+            resetBtn,
+            downloadBtn,
+            pixelSizeRange,
+            brightnessRange,
+            contrastRange,
+            colorPaletteSelect
+        } = this.controls;
 
+        // Image upload logic
+        uploadImageBtn.addEventListener('click', () => imageInput.click());
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.loadImage(file)
+                    .then(() => this.enableControls(true))
+                    .catch(err => console.error('Error loading image:', err));
+            }
+        });
+
+        // Pixel size control
         if (pixelSizeRange) {
-            pixelSizeRange.addEventListener('input', () => this.setPixelSize(pixelSizeRange.value));
+            pixelSizeRange.addEventListener('input', () => {
+                document.getElementById('pixelSizeValue').textContent = pixelSizeRange.value;
+                this.setPixelSize(pixelSizeRange.value);
+            });
         }
+
+        // Brightness control
         if (brightnessRange) {
-            brightnessRange.addEventListener('input', () => this.setBrightness(brightnessRange.value));
+            brightnessRange.addEventListener('input', () => {
+                document.getElementById('brightnessValue').textContent = brightnessRange.value;
+                this.setBrightness(brightnessRange.value);
+            });
         }
+
+        // Contrast control
         if (contrastRange) {
-            contrastRange.addEventListener('input', () => this.setContrast(contrastRange.value));
+            contrastRange.addEventListener('input', () => {
+                document.getElementById('contrastValue').textContent = contrastRange.value;
+                this.setContrast(contrastRange.value);
+            });
         }
+
+        // Color palette control
         if (colorPaletteSelect) {
-            colorPaletteSelect.addEventListener('change', () => this.setColorPalette(colorPaletteSelect.value));
+            colorPaletteSelect.addEventListener('change', () => {
+                this.setColorPalette(colorPaletteSelect.value);
+            });
         }
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            this.resetCanvas();
+        });
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            this.downloadImage();
+        });
+    }
+
+    enableControls(enable) {
+        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect, resetBtn, downloadBtn } = this.controls;
+
+        pixelSizeRange.disabled = !enable;
+        brightnessRange.disabled = !enable;
+        contrastRange.disabled = !enable;
+        colorPaletteSelect.disabled = !enable;
+        resetBtn.disabled = !enable;
+        downloadBtn.disabled = !enable;
+
+        resetBtn.classList.toggle('disabled', !enable);
+        downloadBtn.classList.toggle('disabled', !enable);
     }
 
     loadImage(file) {
@@ -70,12 +137,11 @@ export default class LaivastoPixel {
                 const img = new Image();
                 img.src = e.target.result;
                 img.onload = () => {
-                    // Resize image if necessary and adjust dimensions to ensure full pixels
+                    // Resize image to ensure it aligns with pixel size
                     this.imageCanvas.width = Math.floor(img.width / this.pixelSize) * this.pixelSize;
                     this.imageCanvas.height = Math.floor(img.height / this.pixelSize) * this.pixelSize;
 
                     this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
-
                     this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
                     this.applyPixelation();
                     resolve();
