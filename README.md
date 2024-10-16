@@ -73,6 +73,11 @@ Contributions are welcome! Please follow these steps to contribute:
 4. Push to the branch (git push origin feature-branch).
 5. Open a pull request.
 
+## Working on
+I am currently focused on simplifying the usage of this project. My goal is to making it more intuitive and accessible.
+
+Once this improvement is in place, I will proceed to implement new functionalities to enhance the overall capabilities of the project.
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0.
