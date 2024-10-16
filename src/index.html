@@ -14,45 +14,53 @@
 <body>
 <div class="editor-container">
     <aside class="sidebar">
-        <img src="assets/img/logo.png" alt="Logo" class="logo">
+        <img src="assets/img/logo.png" alt="LaivastoPixel Logo" class="logo">
         <h1>LaivastoPixel</h1>
         <hr>
         <div class="controls">
             <h2>Settings</h2>
-            <label for="pixelSizeRange">Pixel Size: <span id="pixelSizeValue">10</span></label>
-            <input type="range" id="pixelSizeRange" min="2" max="50" value="10" aria-labelledby="pixelSizeRange">
+            <div class="control-group">
+                <label for="pixelSizeRange">Pixel Size: <span id="pixelSizeValue">10</span></label>
+                <input type="range" id="pixelSizeRange" min="2" max="50" value="10" aria-labelledby="pixelSizeRange">
+            </div>
 
-            <label for="brightnessRange">Brightness: <span id="brightnessValue">1</span></label>
-            <input type="range" id="brightnessRange" min="0" max="2" step="0.1" value="1" aria-labelledby="brightnessRange">
+            <div class="control-group">
+                <label for="brightnessRange">Brightness: <span id="brightnessValue">1</span></label>
+                <input type="range" id="brightnessRange" min="0" max="2" step="0.1" value="1" aria-labelledby="brightnessRange">
+            </div>
 
-            <label for="contrastRange">Contrast: <span id="contrastValue">1</span></label>
-            <input type="range" id="contrastRange" min="0" max="2" step="0.1" value="1" aria-labelledby="contrastRange">
+            <div class="control-group">
+                <label for="contrastRange">Contrast: <span id="contrastValue">1</span></label>
+                <input type="range" id="contrastRange" min="0" max="2" step="0.1" value="1" aria-labelledby="contrastRange">
+            </div>
 
-            <label for="colorPaletteSelect">Color Palette:</label>
-            <select id="colorPaletteSelect">
-                <option value="default">Default</option>
-                <option value="grayscale">Grayscale</option>
-                <option value="pastel">Pastel</option>
-                <option value="negative">Negative</option>
-                <option value="sepia">Sepia</option>
-                <option value="vibrant">Vibrant</option>
-                <option value="retro">Retro</option>
-                <option value="neon">Neon</option>
-                <option value="muted">Muted</option>
-            </select>
+            <div class="control-group">
+                <label for="colorPaletteSelect">Color Palette:</label>
+                <select id="colorPaletteSelect">
+                    <option value="default">Default</option>
+                    <option value="grayscale">Grayscale</option>
+                    <option value="pastel">Pastel</option>
+                    <option value="negative">Negative</option>
+                    <option value="sepia">Sepia</option>
+                    <option value="vibrant">Vibrant</option>
+                    <option value="retro">Retro</option>
+                    <option value="neon">Neon</option>
+                    <option value="muted">Muted</option>
+                </select>
+            </div>
 
-            <button id="resetBtn" class="btn" aria-label="Reset Canvas">Reset</button>
-            <button id="downloadBtn" class="btn" aria-label="Download Pixelated Image">Download</button>
+            <button id="resetBtn" class="btn primary-btn" aria-label="Reset Canvas">Reset</button>
+            <button id="downloadBtn" class="btn secondary-btn" aria-label="Download Pixelated Image">Download</button>
         </div>
     </aside>
 
     <main class="canvas-area">
         <nav class="toolbar">
-            <button id="uploadImageBtn" aria-label="Upload Image" class="btn">Upload New Image</button>
+            <button id="uploadImageBtn" aria-label="Upload Image" class="btn primary-btn">Upload New Image</button>
             <input type="file" id="imageInput" style="display:none;" accept="image/*">
         </nav>
         <section class="canvas-section">
-            <canvas id="imageCanvas"></canvas>
+            <canvas id="imageCanvas" style="display: none;"></canvas>
             <canvas id="pixelCanvas"></canvas>
         </section>
     </main>

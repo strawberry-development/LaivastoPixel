@@ -33,12 +33,7 @@ example of page
 Initialize the Library:
 
 ```JS
-const pixelMaster = new LaivastoPixel(imageCanvas, pixelCanvas, {
-    pixelSizeRange,
-    brightnessRange,
-    contrastRange,
-    colorPaletteSelect
-});
+const pixelMaster = new LaivastoPixel();
 ```
 
 Load an Image:

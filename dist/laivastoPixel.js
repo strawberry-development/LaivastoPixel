@@ -8,9 +8,9 @@
  */
 
 export default class LaivastoPixel {
-    constructor(imageCanvas, pixelCanvas, controls) {
-        this.imageCanvas = imageCanvas;
-        this.pixelCanvas = pixelCanvas;
+    constructor() {
+        this.imageCanvas = document.getElementById('imageCanvas');
+        this.pixelCanvas = document.getElementById('pixelCanvas');;
 
         if (!this.imageCanvas || !this.pixelCanvas) {
             throw new Error('Canvas elements are required.');
@@ -23,7 +23,12 @@ export default class LaivastoPixel {
             throw new Error('Failed to get 2D context from canvas elements.');
         }
 
-        this.controls = controls;
+        this.controls = {
+            pixelSizeRange: document.getElementById('pixelSizeRange'),
+            brightnessRange: document.getElementById('brightnessRange'),
+            contrastRange: document.getElementById('contrastRange'),
+            colorPaletteSelect: document.getElementById('colorPaletteSelect')
+        };
 
         this.originalImage = null;
         this.pixelSize = 10;
