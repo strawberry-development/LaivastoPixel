@@ -59,11 +59,13 @@
     <main class="canvas-area">
         <nav class="toolbar">
             <button id="uploadImageBtn" aria-label="Upload Image" class="btn primary-btn">Upload New Image</button>
+            <button id="switchButton" class="btn primary-btn" style="margin-left: 20px;">Switch Canvas</button>
             <input type="file" id="imageInput" style="display:none;" accept="image/*">
         </nav>
         <section class="canvas-section">
             <canvas id="imageCanvas" style="display: none;"></canvas>
             <canvas id="pixelCanvas"></canvas>
+            <em id="canvasStatus">Pixel Canvas</em>
         </section>
     </main>
 </div>

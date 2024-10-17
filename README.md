@@ -4,10 +4,9 @@
 
 # LaivastoPixel - Pixel Art Generator
 
-LaivastoPixel is a pixel art generator library designed to convert images into pixel art. I made this after beeing disapointed by other librairy.
+LaivastoPixel is a pixel art generator library designed to convert images into pixel art. I made this after beeing disapointed by another librairy.
 
-**Important Note**
-
+**Important Note:**
 This project is a prototype created in just a few hours. It is still in its early stages and will evolve over time (Not yet).
 ## Getting Started
 ### Prerequisites
