@@ -1,3 +1,4 @@
+/* Global styles */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,14 +6,13 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f8f8;
-    color: #333;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: 0;
 }
 
 .editor-container {
@@ -22,22 +22,22 @@ body {
     height: 100vh;
     overflow: hidden;
     background-color: #fff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--box-shadow);
 }
 
 .sidebar {
-    background-color: #fafafa;
+    background-color: var(--sidebar-bg-color);
     padding: 30px;
     width: 280px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-right: 1px solid #ececec;
+    border-right: 1px solid var(--sidebar-border-color);
 }
 
 .sidebar h1 {
     font-size: 24px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 20px;
     text-align: center;
 }
@@ -62,17 +62,18 @@ body {
     color: #555;
 }
 
-.controls input[type="range"], .controls select {
+.controls input[type="range"],
+.controls select {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--control-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--control-border-color);
 }
 
 button.btn {
-    background-color: #4CAF50;
+    background-color: var(--button-success-bg);
     color: white;
     border: none;
     border-radius: 5px;
@@ -83,15 +84,15 @@ button.btn {
 }
 
 button.primary-btn {
-    background-color: #007BFF;
+    background-color: var(--button-primary-bg);
 }
 
 button.secondary-btn {
-    background-color: #6C757D;
+    background-color: var(--button-secondary-bg);
 }
 
 button.btn:hover {
-    background-color: #0056b3;
+    background-color: var(--button-hover-bg);
 }
 
 button.btn:active {
@@ -116,7 +117,7 @@ button.btn:active {
 }
 
 .toolbar button {
-    background-color: #007BFF;
+    background-color: var(--button-primary-bg);
     padding: 10px 15px;
     color: #fff;
     border: none;
@@ -138,34 +139,11 @@ canvas {
     max-width: 95%;
     max-height: 95%;
     border-radius: 4px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background-color: var(--canvas-bg-color);
+    box-shadow: var(--shadow-light);
 }
 
-@media (max-width: 1024px) {
-    .editor-container {
-        flex-direction: column;
-        overflow: scroll;
-    }
-
-    .canvas-area {
-        width: 100%;
-        padding: 20px;
-    }
-
-    .sidebar {
-        width: 100%;
-        padding: 15px;
-        border-right: none;
-        border-bottom: 1px solid #ececec;
-    }
-
-    .canvas-section {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .control-group {
-        margin-bottom: 5px;
-    }
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }

@@ -1,6 +1,6 @@
 /**
  * LaivastoPixel - A Pixel Art Generator Library by 'Strawberry-development'.
- * Version: 1.0.1
+ * Version: 1.0.2
  * License: GNU
  *
  * This library allows you to convert images into pixel art, adjust settings (brightness, contrast), and
@@ -34,118 +34,91 @@ export default class LaivastoPixel {
             colorPaletteSelect: document.getElementById('colorPaletteSelect')
         };
 
+        this.defaultSettings = {
+            pixelSize: 10,
+            brightness: 1,
+            contrast: 1,
+            colorPalette: 'default'
+        };
+
+        this.settings = { ...this.defaultSettings };
         this.originalImage = null;
-        this.pixelSize = 10;
-        this.brightness = 1;
-        this.contrast = 1;
-        this.colorPalette = 'default';
-
-        this.defaultPixelSize = this.pixelSize;
-        this.defaultBrightness = this.brightness;
-        this.defaultContrast = this.contrast;
-        this.defaultColorPalette = this.colorPalette;
-
         this.timer = null;
+
+        // Lock all controls except the upload image button
+        this.resetCanvas();
+        this.enableControls(false);
 
         this.initEventListeners();
     }
 
     initEventListeners() {
         const {
-            imageInput,
-            uploadImageBtn,
-            resetBtn,
-            downloadBtn,
-            pixelSizeRange,
-            brightnessRange,
-            contrastRange,
-            colorPaletteSelect
+            imageInput, uploadImageBtn, resetBtn, downloadBtn, pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect
         } = this.controls;
 
-        // Image upload logic
         uploadImageBtn.addEventListener('click', () => imageInput.click());
 
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                this.loadImage(file)
-                    .then(() => this.enableControls(true))
-                    .catch(err => console.error('Error loading image:', err));
+                this.loadImage(file).then(() => this.enableControls(true)); // Unlock controls after loading image
             }
         });
 
-        // Pixel size control
-        if (pixelSizeRange) {
-            pixelSizeRange.addEventListener('input', () => {
-                document.getElementById('pixelSizeValue').textContent = pixelSizeRange.value;
-                this.setPixelSize(pixelSizeRange.value);
-            });
-        }
+        const rangeInputs = [
+            { range: pixelSizeRange, prop: 'pixelSize', update: this.setPixelSize.bind(this) },
+            { range: brightnessRange, prop: 'brightness', update: this.setBrightness.bind(this) },
+            { range: contrastRange, prop: 'contrast', update: this.setContrast.bind(this) }
+        ];
 
-        // Brightness control
-        if (brightnessRange) {
-            brightnessRange.addEventListener('input', () => {
-                document.getElementById('brightnessValue').textContent = brightnessRange.value;
-                this.setBrightness(brightnessRange.value);
-            });
-        }
+        rangeInputs.forEach(({ range, prop, update }) => {
+            if (range) {
+                range.addEventListener('input', () => {
+                    document.getElementById(`${prop}Value`).textContent = range.value;
+                    update(range.value);
+                });
+            }
+        });
 
-        // Contrast control
-        if (contrastRange) {
-            contrastRange.addEventListener('input', () => {
-                document.getElementById('contrastValue').textContent = contrastRange.value;
-                this.setContrast(contrastRange.value);
-            });
-        }
-
-        // Color palette control
         if (colorPaletteSelect) {
             colorPaletteSelect.addEventListener('change', () => {
                 this.setColorPalette(colorPaletteSelect.value);
             });
         }
 
-        // Reset button
-        resetBtn.addEventListener('click', () => {
-            this.resetCanvas();
-        });
-
-        // Download button
-        downloadBtn.addEventListener('click', () => {
-            this.downloadImage();
-        });
+        resetBtn.addEventListener('click', () => this.resetCanvas());
+        downloadBtn.addEventListener('click', () => this.downloadImage());
     }
 
     enableControls(enable) {
-        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect, resetBtn, downloadBtn } = this.controls;
-
-        pixelSizeRange.disabled = !enable;
-        brightnessRange.disabled = !enable;
-        contrastRange.disabled = !enable;
-        colorPaletteSelect.disabled = !enable;
-        resetBtn.disabled = !enable;
-        downloadBtn.disabled = !enable;
-
-        resetBtn.classList.toggle('disabled', !enable);
-        downloadBtn.classList.toggle('disabled', !enable);
+        // Enable or disable all controls except for the upload button
+        Object.values(this.controls).forEach(control => {
+            if (control.tagName === 'BUTTON' || control.tagName === 'SELECT' || control.type === 'range') {
+                if (control !== this.controls.uploadImageBtn) { // Keep upload image button always enabled
+                    control.disabled = !enable;
+                    control.classList.toggle('disabled', !enable);
+                }
+            }
+        });
     }
 
-    loadImage(file) {
+    async loadImage(file) {
+        const img = await this.readImageFile(file);
+        this.imageCanvas.width = Math.floor(img.width / this.settings.pixelSize) * this.settings.pixelSize;
+        this.imageCanvas.height = Math.floor(img.height / this.settings.pixelSize) * this.settings.pixelSize;
+        this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
+        this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
+        this.applyPixelation();
+    }
+
+    readImageFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = e => {
+            reader.onload = (e) => {
                 const img = new Image();
                 img.src = e.target.result;
-                img.onload = () => {
-                    // Resize image to ensure it aligns with pixel size
-                    this.imageCanvas.width = Math.floor(img.width / this.pixelSize) * this.pixelSize;
-                    this.imageCanvas.height = Math.floor(img.height / this.pixelSize) * this.pixelSize;
-
-                    this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
-                    this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
-                    this.applyPixelation();
-                    resolve();
-                };
+                img.onload = () => resolve(img);
                 img.onerror = reject;
             };
             reader.onerror = reject;
@@ -153,66 +126,56 @@ export default class LaivastoPixel {
         });
     }
 
-    debounce(fn, delay) {
+    debounce(fn, delay = 50) {
         clearTimeout(this.timer);
-        this.timer = setTimeout(fn.bind(this), delay);
+        this.timer = setTimeout(fn, delay);
     }
 
     setPixelSize(size) {
-        this.pixelSize = Math.max(1, parseInt(size, 10)); // Ensure pixel size is at least 1
-        this.debounce(this.applyPixelation.bind(this), 50);
+        this.settings.pixelSize = Math.max(1, parseInt(size, 10));
+        this.debounce(() => this.applyPixelation());
     }
 
     setBrightness(brightness) {
-        this.brightness = parseFloat(brightness);
-        this.debounce(this.applyPixelation.bind(this), 50);
+        this.settings.brightness = parseFloat(brightness);
+        this.debounce(() => this.applyPixelation());
     }
 
     setContrast(contrast) {
-        this.contrast = parseFloat(contrast);
-        this.debounce(this.applyPixelation.bind(this), 50);
+        this.settings.contrast = parseFloat(contrast);
+        this.debounce(() => this.applyPixelation());
     }
 
     setColorPalette(palette) {
-        this.colorPalette = palette;
+        this.settings.colorPalette = palette;
         this.applyPixelation();
     }
 
     applyPixelation() {
         if (!this.originalImage) return;
 
-        const pixelSize = Math.floor(this.pixelSize);
+        const { pixelSize } = this.settings;
         const { width, height } = this.originalImage;
-
-        // Ensure pixel canvas matches image canvas dimensions exactly
         this.pixelCanvas.width = width;
         this.pixelCanvas.height = height;
         this.ctxPixel.clearRect(0, 0, width, height);
 
         const imageData = this.originalImage.data;
-
-        // Ensure that no partial pixels are drawn
         const numRows = Math.floor(height / pixelSize);
         const numCols = Math.floor(width / pixelSize);
 
-        let y = 0;
-        const loop = () => {
-            for (let row = 0; row < numRows; row++) {
-                for (let col = 0; col < numCols; col++) {
-                    const startX = col * pixelSize;
-                    const startY = row * pixelSize;
-                    const color = [0, 0, 0];
-                    this.getAverageColor(imageData, startX, startY, width, pixelSize, color);
-                    const adjustedColor = this.adjustColor(color);
-                    const paletteColor = this.applyPalette(adjustedColor);
-
-                    this.ctxPixel.fillStyle = `rgb(${paletteColor[0]}, ${paletteColor[1]}, ${paletteColor[2]})`;
-                    this.ctxPixel.fillRect(startX, startY, pixelSize, pixelSize);
-                }
-                y += pixelSize;
+        for (let row = 0; row < numRows; row++) {
+            for (let col = 0; col < numCols; col++) {
+                const startX = col * pixelSize;
+                const startY = row * pixelSize;
+                const color = [0, 0, 0];
+                this.getAverageColor(imageData, startX, startY, width, pixelSize, color);
+                const adjustedColor = this.adjustColor(color);
+                const paletteColor = this.applyPalette(adjustedColor);
+                this.ctxPixel.fillStyle = `rgb(${paletteColor.join(', ')})`;
+                this.ctxPixel.fillRect(startX, startY, pixelSize, pixelSize);
             }
-        };
-        loop();
+        }
     }
 
     getAverageColor(data, startX, startY, width, pixelSize, color) {
@@ -222,7 +185,7 @@ export default class LaivastoPixel {
 
         for (let y = 0; y < pixelSize; y++) {
             for (let x = 0; x < pixelSize; x++) {
-                const idx = startIdx + ((y * width) + x) * 4;
+                const idx = startIdx + (y * width + x) * 4;
                 r += data[idx];
                 g += data[idx + 1];
                 b += data[idx + 2];
@@ -235,11 +198,8 @@ export default class LaivastoPixel {
     }
 
     adjustColor([r, g, b]) {
-        return [
-            Math.min(255, Math.max(0, Math.round(this.contrast * (r * this.brightness)))),
-            Math.min(255, Math.max(0, Math.round(this.contrast * (g * this.brightness)))),
-            Math.min(255, Math.max(0, Math.round(this.contrast * (b * this.brightness))))
-        ];
+        const { brightness, contrast } = this.settings;
+        return [r, g, b].map(v => Math.min(255, Math.max(0, Math.round(contrast * v * brightness))));
     }
 
     applyPalette(color) {
@@ -254,8 +214,7 @@ export default class LaivastoPixel {
             neon: this.toNeon(color),
             muted: this.toMuted(color)
         };
-
-        return palettes[this.colorPalette] || color;
+        return palettes[this.settings.colorPalette] || color;
     }
 
     toGrayscale([r, g, b]) {
@@ -280,27 +239,15 @@ export default class LaivastoPixel {
     }
 
     toVibrant([r, g, b]) {
-        return [
-            Math.min(255, r * 1.2),
-            Math.min(255, g * 1.2),
-            Math.min(255, b * 1.2)
-        ];
+        return [Math.min(255, r * 1.2), Math.min(255, g * 1.2), Math.min(255, b * 1.2)];
     }
 
     toRetro([r, g, b]) {
-        return [
-            r < 128 ? r * 1.2 : r * 0.8,
-            g < 128 ? g * 1.2 : g * 0.8,
-            b < 128 ? b * 1.2 : b * 0.8
-        ];
+        return [r < 128 ? r * 1.2 : r * 0.8, g < 128 ? g * 1.2 : g * 0.8, b < 128 ? b * 1.2 : b * 0.8];
     }
 
     toNeon([r, g, b]) {
-        return [
-            Math.min(255, r + 100),
-            Math.min(255, g + 100),
-            Math.min(255, b + 100)
-        ];
+        return [Math.min(255, r + 100), Math.min(255, g + 100), Math.min(255, b + 100)];
     }
 
     toMuted([r, g, b]) {
@@ -308,34 +255,23 @@ export default class LaivastoPixel {
     }
 
     resetCanvas() {
-        if (!this.originalImage) return;
-
-        this.pixelSize = this.defaultPixelSize;
-        this.brightness = this.defaultBrightness;
-        this.contrast = this.defaultContrast;
-        this.colorPalette = this.defaultColorPalette;
-
-        if (this.controls.pixelSizeRange) {
-            this.controls.pixelSizeRange.value = this.defaultPixelSize;
-            document.getElementById('pixelSizeValue').textContent = this.defaultPixelSize;
-            this.setPixelSize(this.defaultPixelSize); // Trigger pixel size change
-        }
-        if (this.controls.brightnessRange) {
-            this.controls.brightnessRange.value = this.defaultBrightness;
-            document.getElementById('brightnessValue').textContent = this.defaultBrightness;
-            this.setBrightness(this.defaultBrightness); // Trigger brightness change
-        }
-        if (this.controls.contrastRange) {
-            this.controls.contrastRange.value = this.defaultContrast;
-            document.getElementById('contrastValue').textContent = this.defaultContrast;
-            this.setContrast(this.defaultContrast); // Trigger contrast change
-        }
-        if (this.controls.colorPaletteSelect) {
-            this.controls.colorPaletteSelect.value = this.defaultColorPalette;
-            this.setColorPalette(this.defaultColorPalette); // Trigger color palette change
-        }
-
+        this.settings = { ...this.defaultSettings };
+        this.applyControls();
         this.applyPixelation();
+    }
+
+    applyControls() {
+        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect } = this.controls;
+        const { pixelSize, brightness, contrast, colorPalette } = this.settings;
+
+        if (pixelSizeRange) pixelSizeRange.value = pixelSize;
+        if (brightnessRange) brightnessRange.value = brightness;
+        if (contrastRange) contrastRange.value = contrast;
+        if (colorPaletteSelect) colorPaletteSelect.value = colorPalette;
+
+        document.getElementById('pixelSizeValue').textContent = pixelSize;
+        document.getElementById('brightnessValue').textContent = brightness;
+        document.getElementById('contrastValue').textContent = contrast;
     }
 
     downloadImage() {

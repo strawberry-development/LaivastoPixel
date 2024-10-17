@@ -1,0 +1,27 @@
+@media (max-width: 1024px) {
+    .editor-container {
+        flex-direction: column;
+        overflow: scroll;
+    }
+
+    .canvas-area {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid var(--sidebar-border-color);
+    }
+
+    .canvas-section {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .control-group {
+        margin-bottom: 5px;
+    }
+}

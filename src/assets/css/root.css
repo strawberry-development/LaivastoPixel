@@ -1,0 +1,16 @@
+:root {
+    --font-family: 'Poppins', sans-serif;
+    --background-color: #f8f8f8;
+    --text-color: #333;
+    --sidebar-bg-color: #fafafa;
+    --sidebar-border-color: #ececec;
+    --control-bg-color: #fff;
+    --control-border-color: #ddd;
+    --button-primary-bg: #007BFF;
+    --button-secondary-bg: #6C757D;
+    --button-success-bg: #4CAF50;
+    --button-hover-bg: #0056b3;
+    --canvas-bg-color: #f9f9f9;
+    --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
