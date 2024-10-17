@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaivastoPixel - Min</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+</head>
+<body>
+
+<header>
+    <h1><img src="assets/img/logo.png" alt="LaivastoPixel Logo" width="30">
+        LaivastoPixel - Min version</h1>
+</header>
+
+<main>
+    <section>
+        <p>The minified version is designed to make it easier to implement your own library. You can find all the
+            requirements here without any additional files like CSS or extra JavaScript.</p>
+        <hr>
+    </section>
+
+    <section>
+        <h2>Settings</h2>
+        <fieldset>
+            <label for="pixelSizeRange">Pixel Size: <span id="pixelSizeValue">10</span></label>
+            <input type="range" id="pixelSizeRange" min="2" max="100" value="10" aria-labelledby="pixelSizeRange">
+
+            <label for="brightnessRange">Brightness: <span id="brightnessValue">1</span></label>
+            <input type="range" id="brightnessRange" min="0" max="2" step="0.01" value="1"
+                   aria-labelledby="brightnessRange">
+
+            <label for="contrastRange">Contrast: <span id="contrastValue">1</span></label>
+            <input type="range" id="contrastRange" min="0" max="2" step="0.01" value="1"
+                   aria-labelledby="contrastRange">
+
+            <label for="colorPaletteSelect">Color Palette:</label>
+            <select id="colorPaletteSelect">
+                <option value="default">Default</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="pastel">Pastel</option>
+                <option value="negative">Negative</option>
+                <option value="sepia">Sepia</option>
+                <option value="vibrant">Vibrant</option>
+                <option value="retro">Retro</option>
+                <option value="neon">Neon</option>
+                <option value="muted">Muted</option>
+            </select>
+
+            <button id="resetBtn" aria-label="Reset Canvas">Reset</button>
+            <button id="downloadBtn" aria-label="Download Pixelated Image">Download</button>
+        </fieldset>
+    </section>
+
+    <section>
+        <button id="uploadImageBtn" aria-label="Upload Image">Upload New Image</button>
+        <button id="switchButton">Switch Canvas</button>
+        <input type="file" id="imageInput" style="display:none;" accept="image/*">
+    </section>
+
+    <section>
+        <canvas id="imageCanvas"></canvas>
+        <canvas id="pixelCanvas"></canvas>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2024 LaivastoPixel. GNU !</p>
+</footer>
+
+<script type="module">
+    import LaivastoPixel from './lib/laivastoPixel.js';
+
+    let pixelMaster = new LaivastoPixel();
+</script>
+</body>
+</html>
