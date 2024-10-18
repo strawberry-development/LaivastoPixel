@@ -23,6 +23,7 @@ cd laivastopixel
 2. Open the project:
 Open `index.html` in your web browser. **It may not work, and you may have need to use a localserver**.
 
+base url is `src/`, if this isn't the root feel free to make an `.htaccess`
 3. feel free to use it and discover as your wish.
 example of page
 ![Overview of the page](github/Screenshot.png "Screenshot")

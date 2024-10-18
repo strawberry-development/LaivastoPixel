@@ -9,8 +9,8 @@
 
 export default class LaivastoPixel {
     constructor() {
-        this.imageCanvas = document.getElementById('imageCanvas');
-        this.pixelCanvas = document.getElementById('pixelCanvas');
+        this.imageCanvas = document.getElementById('laivasto-imageCanvas');
+        this.pixelCanvas = document.getElementById('laivasto-pixelCanvas');
 
         if (!this.imageCanvas || !this.pixelCanvas) {
             throw new Error('Canvas elements are required.');
@@ -24,14 +24,14 @@ export default class LaivastoPixel {
         }
 
         this.controls = {
-            imageInput: document.getElementById('imageInput'),
-            uploadImageBtn: document.getElementById('uploadImageBtn'),
-            resetBtn: document.getElementById('resetBtn'),
-            downloadBtn: document.getElementById('downloadBtn'),
-            pixelSizeRange: document.getElementById('pixelSizeRange'),
-            brightnessRange: document.getElementById('brightnessRange'),
-            contrastRange: document.getElementById('contrastRange'),
-            colorPaletteSelect: document.getElementById('colorPaletteSelect')
+            imageInput: document.getElementById('laivasto-imageInput'),
+            uploadImageBtn: document.getElementById('laivasto-uploadImageBtn'),
+            resetBtn: document.getElementById('laivasto-resetBtn'),
+            downloadBtn: document.getElementById('laivasto-downloadBtn'),
+            pixelSizeRange: document.getElementById('laivasto-pixelSizeRange'),
+            brightnessRange: document.getElementById('laivasto-brightnessRange'),
+            contrastRange: document.getElementById('laivasto-contrastRange'),
+            colorPaletteSelect: document.getElementById('laivasto-colorPaletteSelect')
         };
 
         this.defaultSettings = {
@@ -75,7 +75,7 @@ export default class LaivastoPixel {
         rangeInputs.forEach(({ range, prop, update }) => {
             if (range) {
                 range.addEventListener('input', () => {
-                    document.getElementById(`${prop}Value`).textContent = range.value;
+                    document.getElementById(`laivasto-${prop}Value`).textContent = range.value;
                     update(range.value);
                 });
             }
@@ -212,7 +212,14 @@ export default class LaivastoPixel {
             vibrant: this.toVibrant(color),
             retro: this.toRetro(color),
             neon: this.toNeon(color),
-            muted: this.toMuted(color)
+            muted: this.toMuted(color),
+            warm: this.toWarm(color),
+            cool: this.toCool(color),
+            vintage: this.toVintage(color),
+            highContrast: this.toHighContrast(color),
+            nightMode: this.toNightMode(color),
+            blackAndWhite: this.toBlackAndWhite(color),
+            solarized: this.toSolarized(color)
         };
         return palettes[this.settings.colorPalette] || color;
     }
@@ -254,6 +261,51 @@ export default class LaivastoPixel {
         return [r * 0.8, g * 0.8, b * 0.8];
     }
 
+    toWarm([r, g, b]) {
+        return [Math.min(255, r + 50), g, Math.max(0, b - 50)];
+    }
+
+    toCool([r, g, b]) {
+        return [Math.max(0, r - 50), g, Math.min(255, b + 50)];
+    }
+
+    toVintage([r, g, b]) {
+        return [
+            Math.min(255, r * 0.9 + 40),
+            Math.min(255, g * 0.85 + 30),
+            Math.min(255, b * 0.7 + 20)
+        ];
+    }
+
+    toHighContrast([r, g, b]) {
+        return [
+            r > 128 ? Math.min(255, r * 1.5) : Math.max(0, r * 0.5),
+            g > 128 ? Math.min(255, g * 1.5) : Math.max(0, g * 0.5),
+            b > 128 ? Math.min(255, b * 1.5) : Math.max(0, b * 0.5)
+        ];
+    }
+
+    toNightMode([r, g, b]) {
+        return [
+            Math.max(0, r * 0.5),
+            Math.max(0, g * 0.5),
+            Math.min(255, b * 1.5)
+        ];
+    }
+
+    toBlackAndWhite([r, g, b]) {
+        const avg = (r + g + b) / 3;
+        return avg > 128 ? [255, 255, 255] : [0, 0, 0];
+    }
+
+    toSolarized([r, g, b]) {
+        return [
+            r > 128 ? 255 - r : r * 1.2,
+            g > 128 ? 255 - g : g * 1.2,
+            b > 128 ? 255 - b : b * 1.2
+        ];
+    }
+
     resetCanvas() {
         this.settings = { ...this.defaultSettings };
         this.applyControls();
@@ -269,9 +321,9 @@ export default class LaivastoPixel {
         if (contrastRange) contrastRange.value = contrast;
         if (colorPaletteSelect) colorPaletteSelect.value = colorPalette;
 
-        document.getElementById('pixelSizeValue').textContent = pixelSize;
-        document.getElementById('brightnessValue').textContent = brightness;
-        document.getElementById('contrastValue').textContent = contrast;
+        document.getElementById('laivasto-pixelSizeValue').textContent = pixelSize;
+        document.getElementById('laivasto-brightnessValue').textContent = brightness;
+        document.getElementById('laivasto-contrastValue').textContent = contrast;
     }
 
     downloadImage() {

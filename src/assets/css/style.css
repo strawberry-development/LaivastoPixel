@@ -27,8 +27,8 @@ body {
 
 .sidebar {
     background-color: var(--sidebar-bg-color);
-    padding: 30px;
-    width: 280px;
+    padding: 20px;
+    width: 240px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

@@ -5,8 +5,8 @@ let pixelMaster = new LaivastoPixel();
 // Refractor this code into the library
 
 const switchButton = document.getElementById('switchButton');
-const imageCanvas = document.getElementById('imageCanvas');
-const pixelCanvas = document.getElementById('pixelCanvas');
+const imageCanvas = document.getElementById('laivasto-imageCanvas');
+const pixelCanvas = document.getElementById('laivasto-pixelCanvas');
 const canvasStatus = document.getElementById('canvasStatus');
 
 switchButton.addEventListener('click', function() {
