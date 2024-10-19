@@ -1,6 +1,6 @@
 /**
  * LaivastoPixel - A Pixel Art Generator Library by 'Strawberry-development'.
- * Version: 1.0.2
+ * Version: 1.0.3
  * License: GNU
  *
  * This library allows you to convert images into pixel art, adjust settings (brightness, contrast), and
@@ -31,30 +31,30 @@ export default class LaivastoPixel {
             pixelSizeRange: document.getElementById('laivasto-blockSizeRange'),
             brightnessRange: document.getElementById('laivasto-brightnessRange'),
             contrastRange: document.getElementById('laivasto-contrastRange'),
-            colorPaletteSelect: document.getElementById('laivasto-filterSelect')
+            colorPaletteSelect: document.getElementById('laivasto-filterSelect'),
+            gridToggle: document.getElementById('laivasto-gridToggle')
         };
 
         this.defaultSettings = {
             pixelSize: 10,
             brightness: 1,
             contrast: 1,
-            colorPalette: 'default'
+            colorPalette: 'default',
+            showGrid: false // Default grid toggle state
         };
 
         this.settings = { ...this.defaultSettings };
         this.originalImage = null;
         this.timer = null;
 
-        // Lock all controls except the upload image button
         this.resetCanvas();
         this.enableControls(false);
-
         this.initEventListeners();
     }
 
     initEventListeners() {
         const {
-            imageInput, uploadImageBtn, resetBtn, downloadBtn, pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect
+            imageInput, uploadImageBtn, resetBtn, downloadBtn, pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect, gridToggle
         } = this.controls;
 
         uploadImageBtn.addEventListener('click', () => imageInput.click());
@@ -62,7 +62,7 @@ export default class LaivastoPixel {
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                this.loadImage(file).then(() => this.enableControls(true)); // Unlock controls after loading image
+                this.loadImage(file).then(() => this.enableControls(true));
             }
         });
 
@@ -76,7 +76,7 @@ export default class LaivastoPixel {
             if (range) {
                 range.addEventListener('input', () => {
                     document.getElementById(`laivasto-${prop}Value`).textContent = range.value;
-                    update(range.value);
+                    this.debounce(() => update(range.value)); // Added debounce for performance
                 });
             }
         });
@@ -89,13 +89,17 @@ export default class LaivastoPixel {
 
         resetBtn.addEventListener('click', () => this.resetCanvas());
         downloadBtn.addEventListener('click', () => this.downloadImage());
+
+        // Added grid toggle event listener
+        gridToggle.addEventListener('change', () => {
+            this.setGridToggle(gridToggle.checked);
+        });
     }
 
     enableControls(enable) {
-        // Enable or disable all controls except for the upload button
         Object.values(this.controls).forEach(control => {
-            if (control.tagName === 'BUTTON' || control.tagName === 'SELECT' || control.type === 'range') {
-                if (control !== this.controls.uploadImageBtn) { // Keep upload image button always enabled
+            if (control.tagName === 'BUTTON' || control.tagName === 'SELECT' || control.type === 'range' || control.type === 'checkbox') {
+                if (control !== this.controls.uploadImageBtn) {
                     control.disabled = !enable;
                     control.classList.toggle('disabled', !enable);
                 }
@@ -104,12 +108,17 @@ export default class LaivastoPixel {
     }
 
     async loadImage(file) {
-        const img = await this.readImageFile(file);
-        this.imageCanvas.width = Math.floor(img.width / this.settings.pixelSize) * this.settings.pixelSize;
-        this.imageCanvas.height = Math.floor(img.height / this.settings.pixelSize) * this.settings.pixelSize;
-        this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
-        this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
-        this.applyPixelation();
+        try {
+            const img = await this.readImageFile(file);
+            this.imageCanvas.width = Math.floor(img.width / this.settings.pixelSize) * this.settings.pixelSize;
+            this.imageCanvas.height = Math.floor(img.height / this.settings.pixelSize) * this.settings.pixelSize;
+            this.ctxImage.drawImage(img, 0, 0, this.imageCanvas.width, this.imageCanvas.height);
+            this.originalImage = this.ctxImage.getImageData(0, 0, this.imageCanvas.width, this.imageCanvas.height);
+            this.applyPixelation();
+        } catch (error) {
+            console.error('Error loading image:', error);
+            alert('Failed to load image. Please upload a valid image file.');
+        }
     }
 
     readImageFile(file) {
@@ -133,17 +142,17 @@ export default class LaivastoPixel {
 
     setPixelSize(size) {
         this.settings.pixelSize = Math.max(1, parseInt(size, 10));
-        this.debounce(() => this.applyPixelation());
+        this.applyPixelation();
     }
 
     setBrightness(brightness) {
         this.settings.brightness = parseFloat(brightness);
-        this.debounce(() => this.applyPixelation());
+        this.applyPixelation();
     }
 
     setContrast(contrast) {
         this.settings.contrast = parseFloat(contrast);
-        this.debounce(() => this.applyPixelation());
+        this.applyPixelation();
     }
 
     setColorPalette(palette) {
@@ -151,10 +160,15 @@ export default class LaivastoPixel {
         this.applyPixelation();
     }
 
+    setGridToggle(showGrid) {
+        this.settings.showGrid = showGrid;
+        this.applyPixelation();
+    }
+
     applyPixelation() {
         if (!this.originalImage) return;
 
-        const { pixelSize } = this.settings;
+        const { pixelSize, showGrid } = this.settings;
         const { width, height } = this.originalImage;
         this.pixelCanvas.width = width;
         this.pixelCanvas.height = height;
@@ -175,6 +189,10 @@ export default class LaivastoPixel {
                 this.ctxPixel.fillStyle = `rgb(${paletteColor.join(', ')})`;
                 this.ctxPixel.fillRect(startX, startY, pixelSize, pixelSize);
             }
+        }
+
+        if (showGrid) {
+            this.drawGrid();
         }
     }
 
@@ -203,27 +221,29 @@ export default class LaivastoPixel {
     }
 
     applyPalette(color) {
-        const palettes = {
-            default: color,
-            grayscale: this.toGrayscale(color),
-            pastel: this.toPastel(color),
-            negative: this.toNegative(color),
-            sepia: this.toSepia(color),
-            vibrant: this.toVibrant(color),
-            retro: this.toRetro(color),
-            neon: this.toNeon(color),
-            muted: this.toMuted(color),
-            warm: this.toWarm(color),
-            cool: this.toCool(color),
-            vintage: this.toVintage(color),
-            highContrast: this.toHighContrast(color),
-            nightMode: this.toNightMode(color),
-            blackAndWhite: this.toBlackAndWhite(color),
-            solarized: this.toSolarized(color)
+        const paletteTransforms = {
+            grayscale: this.toGrayscale,
+            pastel: this.toPastel,
+            negative: this.toNegative,
+            sepia: this.toSepia,
+            vibrant: this.toVibrant,
+            retro: this.toRetro,
+            neon: this.toNeon,
+            muted: this.toMuted,
+            warm: this.toWarm,
+            cool: this.toCool,
+            vintage: this.toVintage,
+            highContrast: this.toHighContrast,
+            nightMode: this.toNightMode,
+            blackAndWhite: this.toBlackAndWhite,
+            solarized: this.toSolarized
         };
-        return palettes[this.settings.colorPalette] || color;
+
+        const transform = paletteTransforms[this.settings.colorPalette];
+        return transform ? transform(color) : color;
     }
 
+    // Palette transformations
     toGrayscale([r, g, b]) {
         const avg = (r + g + b) / 3;
         return [avg, avg, avg];
@@ -313,13 +333,14 @@ export default class LaivastoPixel {
     }
 
     applyControls() {
-        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect } = this.controls;
-        const { pixelSize, brightness, contrast, colorPalette } = this.settings;
+        const { pixelSizeRange, brightnessRange, contrastRange, colorPaletteSelect, gridToggle } = this.controls;
+        const { pixelSize, brightness, contrast, colorPalette, showGrid } = this.settings;
 
         if (pixelSizeRange) pixelSizeRange.value = pixelSize;
         if (brightnessRange) brightnessRange.value = brightness;
         if (contrastRange) contrastRange.value = contrast;
         if (colorPaletteSelect) colorPaletteSelect.value = colorPalette;
+        if (gridToggle) gridToggle.checked = showGrid;
 
         document.getElementById('laivasto-blockSizeValue').textContent = pixelSize;
         document.getElementById('laivasto-brightnessValue').textContent = brightness;
@@ -331,5 +352,25 @@ export default class LaivastoPixel {
         link.href = this.pixelCanvas.toDataURL('image/png');
         link.download = 'pixelated_image.png';
         link.click();
+    }
+
+    drawGrid() {
+        const { pixelSize } = this.settings;
+        const { width, height } = this.pixelCanvas;
+        this.ctxPixel.strokeStyle = 'rgba(0, 0, 0, 0.1)'; // Light grid lines
+
+        for (let x = 0; x < width; x += pixelSize) {
+            this.ctxPixel.beginPath();
+            this.ctxPixel.moveTo(x, 0);
+            this.ctxPixel.lineTo(x, height);
+            this.ctxPixel.stroke();
+        }
+
+        for (let y = 0; y < height; y += pixelSize) {
+            this.ctxPixel.beginPath();
+            this.ctxPixel.moveTo(0, y);
+            this.ctxPixel.lineTo(width, y);
+            this.ctxPixel.stroke();
+        }
     }
 }
