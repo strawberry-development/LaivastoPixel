@@ -28,10 +28,10 @@ export default class LaivastoPixel {
             uploadImageBtn: document.getElementById('laivasto-uploadImageBtn'),
             resetBtn: document.getElementById('laivasto-resetBtn'),
             downloadBtn: document.getElementById('laivasto-downloadBtn'),
-            pixelSizeRange: document.getElementById('laivasto-pixelSizeRange'),
+            pixelSizeRange: document.getElementById('laivasto-blockSizeRange'),
             brightnessRange: document.getElementById('laivasto-brightnessRange'),
             contrastRange: document.getElementById('laivasto-contrastRange'),
-            colorPaletteSelect: document.getElementById('laivasto-colorPaletteSelect')
+            colorPaletteSelect: document.getElementById('laivasto-filterSelect')
         };
 
         this.defaultSettings = {
@@ -67,7 +67,7 @@ export default class LaivastoPixel {
         });
 
         const rangeInputs = [
-            { range: pixelSizeRange, prop: 'pixelSize', update: this.setPixelSize.bind(this) },
+            { range: pixelSizeRange, prop: 'blockSize', update: this.setPixelSize.bind(this) },
             { range: brightnessRange, prop: 'brightness', update: this.setBrightness.bind(this) },
             { range: contrastRange, prop: 'contrast', update: this.setContrast.bind(this) }
         ];
@@ -321,7 +321,7 @@ export default class LaivastoPixel {
         if (contrastRange) contrastRange.value = contrast;
         if (colorPaletteSelect) colorPaletteSelect.value = colorPalette;
 
-        document.getElementById('laivasto-pixelSizeValue').textContent = pixelSize;
+        document.getElementById('laivasto-blockSizeValue').textContent = pixelSize;
         document.getElementById('laivasto-brightnessValue').textContent = brightness;
         document.getElementById('laivasto-contrastValue').textContent = contrast;
     }

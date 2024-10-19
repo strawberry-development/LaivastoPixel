@@ -16,8 +16,10 @@
 <body>
 <div class="editor-container">
     <aside class="sidebar">
-        <img src="assets/img/logo.png" alt="LaivastoPixel Logo" class="logo">
-        <h1>LaivastoPixel</h1>
+        <a draggable="false" href="#" id="refreshLink">
+            <img src="assets/img/logo.png" alt="LaivastoPixel Logo" class="logo">
+            <h1>LaivastoPixel</h1>
+        </a>
         <hr>
         <div style="margin-top: 10px;">
             <button id="laivasto-resetBtn" class="btn primary-btn" aria-label="Reset Canvas">Reset</button>
@@ -26,8 +28,8 @@
         <div class="controls">
             <h2>Settings</h2>
             <div class="control-group">
-                <label for="laivasto-pixelSizeRange">Pixel Size: <span id="laivasto-pixelSizeValue">10</span></label>
-                <input type="range" id="laivasto-pixelSizeRange" min="2" max="100" value="10" aria-labelledby="pixelSizeRange">
+                <label for="laivasto-blockSizeRange">Block Size: <span id="laivasto-blockSizeValue">10</span></label>
+                <input type="range" id="laivasto-blockSizeRange" min="2" max="100" value="10" aria-labelledby="pixelSizeRange">
             </div>
 
             <div class="control-group">
@@ -41,8 +43,8 @@
             </div>
 
             <div class="control-group">
-                <label for="laivasto-colorPaletteSelect">Filter:</label>
-                <select id="laivasto-colorPaletteSelect">
+                <label for="laivasto-filterSelect">Filter:</label>
+                <select id="laivasto-filterSelect">
                     <option value="default">Default</option>
                     <option value="grayscale">Grayscale</option>
                     <option value="pastel">Pastel</option>

@@ -1,6 +1,11 @@
 import LaivastoPixel from '../lib/laivastoPixel.js';
 let pixelMaster = new LaivastoPixel();
 
+document.getElementById('refreshLink').addEventListener('click', function (event) {
+    event.preventDefault();
+    location.reload();
+});
+
 // TODO
 // Refractor this code into the library
 
